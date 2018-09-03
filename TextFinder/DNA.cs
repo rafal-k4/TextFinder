@@ -12,16 +12,18 @@ namespace TextFinder
 
         internal static void MakeAFirstPopulation(int populationSize)
         {
+            ToolClass.population.Clear();
+
             for (int i = 0; i < populationSize; i++)
             {
-                ToolClass.population.Add(new Individual(Form1.targetText.Length));
+                ToolClass.population.Add(new Individual(Form1.targetText.TextLength));
             }
 
             foreach (var item in ToolClass.population)
             {
-                for (int i = 0; i < Form1.targetText.Length; i++)
+                for (int i = 0; i < Form1.targetText.TextLength; i++)
                 {
-                    item.letters[i] = GetRandomChar();
+                    item.letters[i] = RandomCharacterGenerator.GetRandomChar();
                     //item.letters[i] = Convert.ToChar(random.Next(97, 122));
                 }
             }
@@ -33,10 +35,10 @@ namespace TextFinder
             foreach (var item in population)
             {
                 int score = 0;
-                for (int i = 0; i < Form1.targetText.Length; i++)
+                for (int i = 0; i < Form1.targetText.TextLength; i++)
                 {
 
-                    if (item.letters[i] == Form1.targetText[i])
+                    if (item.letters[i] == Form1.targetText.Text[i])
                     {
                         score++;
                     }
@@ -50,7 +52,7 @@ namespace TextFinder
                     //    }
                     //}
                 }
-                item.fitness = (float)score / Form1.targetText.Length;
+                item.fitness = (float)score / Form1.targetText.TextLength;
             }
 
 
@@ -106,10 +108,10 @@ namespace TextFinder
 
         private static Individual Crossover(Individual parentA, Individual parentB)
         {
-            Individual child = new Individual(Form1.targetText.Length);
-            int randomPick = ToolClass.random.Next(0, Form1.targetText.Length);
+            Individual child = new Individual(Form1.targetText.TextLength);
+            int randomPick = ToolClass.random.Next(0, Form1.targetText.TextLength);
 
-            for (int i = 0; i < Form1.targetText.Length; i++)
+            for (int i = 0; i < Form1.targetText.TextLength; i++)
             {
                 if (child.letters[i] == parentA.letters[i])
                 {
@@ -136,35 +138,18 @@ namespace TextFinder
         {
             foreach (var item in ToolClass.population)
             {
-                for (int i = 0; i < Form1.targetText.Length; i++)
+                for (int i = 0; i < Form1.targetText.TextLength; i++)
                 {
                     if (ToolClass.random.NextDouble() <= mutationRate)
                     {
-                        item.letters[i] = GetRandomChar();
+                        item.letters[i] = RandomCharacterGenerator.GetRandomChar();
                     }
 
                 }
             }
         }
 
-        private static char GetRandomChar()
-        {
-            int signNumber = ToolClass.random.Next(62, 123);
-            if (signNumber == 63)
-            {
-                signNumber = 32;
-            }
-            else if (signNumber == 64)
-            {
-                signNumber = 46;
-            }
-            else if (signNumber == 62)
-            {
-                signNumber = 44;
-            }
-            char sign = Convert.ToChar(signNumber);
-            return sign;
-        }
+        
 
         internal static void CheckForResult()
         {
@@ -172,16 +157,17 @@ namespace TextFinder
             string result = "";
             foreach (var item in ToolClass.population)
             {
-                for (int i = 0; i < Form1.targetText.Length; i++)
+                for (int i = 0; i < Form1.targetText.TextLength; i++)
                 {
                     result += item.letters[i];
                 }
-                if (result == Form1.targetText)
+                if (result == Form1.targetText.Text)
                 {
                     Form1.timer.Stop();
-                    Form1.txtBox1.AppendText(result);
+                    Form1.txtBox1.AppendText(result + Environment.NewLine);
                     checker = false;
-                    Form1.labeltext4 = result;
+                    Form1.labeltext4.Text = result;
+                    break;
                 }
                 else
                 {
@@ -195,18 +181,19 @@ namespace TextFinder
 
             //-------------wybieranie najbardziej podobnego slowa do slowa docelowego------------
             var bestParent = ToolClass.population.First(r => r.fitness == maxFitnessFactor);
-            for (int i = 0; i < Form1.targetText.Length; i++)
+            for (int i = 0; i < Form1.targetText.TextLength; i++)
             {
                 line += bestParent.letters[i].ToString();
             }
             if (checker)
             {
                 Form1.txtBox1.AppendText(line + Environment.NewLine);
-                //label3.Text = line;
+                Form1.labeltext4.Text = line;
             }
 
-            //label1.Text = "Obecna populacja: " + ToolClass.currentPopulation;
-            //label2.Text = "Average Fitness: " + ToolClass.averageFitness;
+            Form1.lbl2.Text = "Obecna populacja: " + ToolClass.currentPopulation;
+            Form1.lbl3.Text = String.Format("Average Fitness: {0:p}", ToolClass.averageFitness);
+                
 
             ToolClass.currentPopulation++;
         }
